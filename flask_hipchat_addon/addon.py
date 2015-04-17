@@ -4,6 +4,7 @@ import os
 import logging
 import httplib
 
+from werkzeug.utils import import_string
 
 from flask import jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -27,13 +28,13 @@ def _not_none(app, name, default):
 
 class Addon(object):
 
-    def __init__(self, app, key=None, name=None, description=None, config=None,
+    def __init__(self, app, key=None, name=None, description=None,
                  allow_room=True, allow_global=False, scopes=None, vendor_name=None, vendor_url=None):
         if scopes is None:
             scopes = ['send_notification']
 
         self.app = app
-        self._init_app(app, config)
+        self._init_app(app)
 
         db.init_app(app)
         cache.init_app(app, config=app.config)
@@ -71,11 +72,12 @@ class Addon(object):
         self.app.route("/")(descriptor)
 
     @staticmethod
-    def _init_app(app, config):
+    def _init_app(app):
 
-        app.config.from_object('flask_hipchat_addon.default_settings')
-        if config is not None:
-            app.config.from_object(config)
+        obj = import_string('flask_hipchat_addon.default_settings')
+        for key in dir(obj):
+            if key.isupper() and key not in app.config.keys():
+                app.config[key] = getattr(obj, key)
 
         if app.config['DEBUG']:
             # These two lines enable debugging at httplib level (requests->urllib3->httplib)
@@ -143,7 +145,7 @@ class Addon(object):
             print("Public descriptor base URL: %s" % self.app.config['HIPCHAT_ADDON_BASE_URL'])
             print("--------------------------------------")
             print("")
-            #for k, v in self.app.config.items():
-            #    print(k, '=', v)
+            for k, v in self.app.config.items():
+                print(k, '=', v)
 
         self.app.run(*args, **kwargs)

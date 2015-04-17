@@ -7,7 +7,7 @@ from flask_hipchat_addon.addon import Addon
 
 app = Flask(__name__)
 app.config.from_object('settings')
-addon = Addon(app=app, allow_room=True, allow_global=True, scopes=['send_notification'])
+addon = Addon(app=app, allow_global=True, scopes=['send_notification'])
 
 
 @addon.webhook(event='room_message', pattern='.*')
