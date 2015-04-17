@@ -7,3 +7,5 @@ HIPCHAT_ADDON_VENDOR_URL = 'http://example.com'
 HIPCHAT_ADDON_VENDOR_NAME = 'example org'
 
 HIPCHAT_ADDON_BASE_URL = 'https://2e3665aa.ngrok.com'
+
+CACHE_TYPE='simple'

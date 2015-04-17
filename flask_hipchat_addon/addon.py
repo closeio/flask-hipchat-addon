@@ -7,8 +7,10 @@ import httplib
 
 from flask import jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.cache import Cache
 
 db = SQLAlchemy()
+cache = Cache()
 
 import installable
 from .auth import require_tenant
@@ -32,7 +34,10 @@ class Addon(object):
 
         self.app = app
         self._init_app(app, config)
+
         db.init_app(app)
+        cache.init_app(app, config=app.config)
+
         db.create_all(app=app)
 
         self.descriptor = {

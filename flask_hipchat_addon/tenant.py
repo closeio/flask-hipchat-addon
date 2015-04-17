@@ -2,10 +2,11 @@ import logging
 import requests
 import base64
 import jwt
-from .addon import db
+from .addon import db, cache
 
 _log = logging.getLogger(__name__)
 
+ACCESS_TOKEN_CACHE = "hipchat-tokens:{oauth_id}"
 
 class Tenant(db.Model):
     __tablename__ = 'tenant'
@@ -31,6 +32,7 @@ class Tenant(db.Model):
         self.capabilities_url = capabilities_url or None if not capdoc \
             else capdoc['links']['self']
 
+    @cache.cached(timeout=50, key_prefix='tenant_get_token')
     def get_token(self, token_only=True, scopes=None):
         if scopes is None:
             scopes = ['send_notification']
@@ -57,7 +59,6 @@ class Tenant(db.Model):
                 raise Exception("Invalid token: %s" % resp.text)
 
         if token_only:
-            #cache logic but for now just gen_token()
             data = gen_token()
             token = data['access_token']
             return token

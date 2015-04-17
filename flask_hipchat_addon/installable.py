@@ -3,7 +3,7 @@ import logging
 import requests
 from flask import request
 
-from .addon import db
+from .addon import db, cache
 from .tenant import Tenant
 from .events import events
 
@@ -13,6 +13,10 @@ _log = logging.getLogger(__name__)
 def _invalid_install(msg):
     _log.error("Installation failed: %s" % msg)
     return msg, 400
+
+@cache.cached(timeout=3600, key_prefix='get_capabilities')
+def get_capabilities(url):
+    return requests.get(url, timeout=10).json()
 
 
 def init(addon, allow_global, allow_room, send_events=True, require_group_id=False):
@@ -29,7 +33,7 @@ def init(addon, allow_global, allow_room, send_events=True, require_group_id=Fal
 
         _log.info("Retrieving capabilities doc at %s" % data['capabilitiesUrl'])
 
-        capdoc = requests.get(data['capabilitiesUrl'], timeout=10).json()
+        capdoc = get_capabilities(data['capabilitiesUrl'])
         if capdoc['links'].get('self', None) != data['capabilitiesUrl']:
             return _invalid_install("The capabilities URL %s doesn't match the resource's self link %s" %
                                     (data['capabilitiesUrl'], capdoc['links'].get('self', None)))
