@@ -46,7 +46,7 @@ class Tenant(db.Model):
                 'content-type': 'application/x-www-form-urlencoded',
                 'Authorization': 'Basic ' + base64.b64encode(str(self.oauth_id) + ':' + str(self.secret))
             }
-            resp = requests.post(self.token_url, params=oauth_params, headers=oauth_headers, timeout=30)
+            resp = requests.post(self.token_url, params=oauth_params, headers=oauth_headers, timeout=10)
             if resp.status_code == 200:
                 _log.debug('Token request response: ' + resp.text)
                 return resp.json()
