@@ -1,0 +1,9 @@
+.idea
+*.iml
+*.ipr
+*.iws
+*~
+venv
+*.pyc
+*.egg-info
+dist
