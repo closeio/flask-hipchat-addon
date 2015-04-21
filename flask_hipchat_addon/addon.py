@@ -34,12 +34,12 @@ class Addon(object):
             scopes = ['send_notification']
 
         self.app = app
-        self._init_app(app)
+        self._init_app(self.app)
 
-        db.init_app(app)
-        cache.init_app(app, config=app.config)
+        db.init_app(self.app)
+        cache.init_app(self.app, config=app.config)
 
-        db.create_all(app=app)
+        db.create_all(app=self.app)
 
         self.descriptor = {
             "key": _not_none(app, 'HIPCHAT_ADDON_KEY', key),
@@ -66,6 +66,7 @@ class Addon(object):
         installable.init(addon=self, allow_global=allow_global, allow_room=allow_room)
 
         @self.app.route("/addon/descriptor")
+        @cache.cached(3600)
         def descriptor():
             return jsonify(self.descriptor)
 
@@ -145,7 +146,7 @@ class Addon(object):
             print("Public descriptor base URL: %s" % self.app.config['HIPCHAT_ADDON_BASE_URL'])
             print("--------------------------------------")
             print("")
-            for k, v in self.app.config.items():
-                print(k, '=', v)
+            #for k, v in self.app.config.items():
+            #    print(k, '=', v)
 
         self.app.run(*args, **kwargs)

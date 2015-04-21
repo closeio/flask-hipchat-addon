@@ -14,7 +14,7 @@ def _invalid_install(msg):
     _log.error("Installation failed: %s" % msg)
     return msg, 400
 
-@cache.cached(timeout=3600, key_prefix='get_capabilities')
+@cache.memoize(timeout=3600)
 def get_capabilities(url):
     return requests.get(url, timeout=10).json()
 
@@ -69,6 +69,7 @@ def init(addon, allow_global, allow_room, send_events=True, require_group_id=Fal
     @addon.app.route('/addon/installable/<string:oauth_id>', methods=['DELETE'])
     def on_uninstall(oauth_id):
         client = Tenant.query.filter_by(oauth_id=oauth_id).first()
+        cache.delete_memoized(client.get_token)
         db.session.delete(client)
         db.session.commit()
         if send_events:

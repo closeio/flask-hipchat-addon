@@ -46,7 +46,6 @@ class Tenant(db.Model):
             scopes = ['send_notification']
 
         def gen_token():
-            print 'gen_token oauth_id=%s secret=%s' % (self.oauth_id, self.secret)
             oauth_params = {
                 'grant_type': 'client_credentials',
                 'scope': ' '.join(scopes)

@@ -18,13 +18,11 @@ def require_tenant(func):
 
 
 def _validate_jwt(req):
-    print req.args
     jwt_data = req.args.get('signed_request', None)
     if not jwt_data:
         abort(401)
 
     oauth_id = jwt.decode(jwt_data, verify=False)['iss']
-    print oauth_id
     client = Tenant.query.filter_by(oauth_id=oauth_id).first()
     data = jwt.decode(jwt_data, client.secret)
     return client, data['prn']
