@@ -146,7 +146,10 @@ class Addon(object):
             print("Public descriptor base URL: %s" % self.app.config['HIPCHAT_ADDON_BASE_URL'])
             print("--------------------------------------")
             print("")
-            #for k, v in self.app.config.items():
-            #    print(k, '=', v)
-
+            if app.config['DEBUG']:
+                for k, v in self.app.config.items():
+                    print(k, '=', v)
         self.app.run(*args, **kwargs)
+
+    def __call__(self, *args, **kwargs):
+        return self.app.__call__(*args, **kwargs)
